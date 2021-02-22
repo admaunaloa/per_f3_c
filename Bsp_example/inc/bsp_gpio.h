@@ -1,7 +1,7 @@
 /**
- * @file per_dep.h
+ * @file bsp_gpio.h
  *
- * This file contains the peripheral dependency and portability macros
+ * This file contains the Board Support Package (BSP) General Purpose Input Output (GPIO)
  *
  * Copyright (c) 2021 admaunaloa admaunaloa@gmail.com
  *
@@ -24,28 +24,28 @@
  * SOFTWARE.
  */
 
-#ifndef per_dep_h
-#define per_dep_h
+#ifndef bsp_gpio_h_
+#define bsp_gpio_h_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// All the external dependencies of the library
-#include <stdbool.h>
-#include <stdint.h>
+#include "per_gpio.h"
 
-/// Provide the correct in-line definition for the project here
-#define per_inline inline
+/// GPIOA
+#define bsp_gpio_usart2_tx()        (&PER_GPIOA->Od[PER_GPIO_PIN_2])
+#define bsp_gpio_usart2_rx()        (&PER_GPIOA->Id[PER_GPIO_PIN_3])
+#define bsp_gpio_led_blue()         (&PER_GPIOA->Od[PER_GPIO_PIN_5])
 
-/// Provide the correct LOG2 function
-#define per_log2(x) __builtin_ctz(x)
+/// GPIOC
+#define bsp_user_button_1()         (&PER_GPIOC->Id[PER_GPIO_PIN_13])
 
-/// Logging peripheral error event with value
-void per_dep_log_err(uint_fast32_t per, uint_fast32_t ev, uint_fast32_t val);
+
+void bsp_gpio_init(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // per_dep_h
+#endif // bsp_gpio_h_

@@ -1,7 +1,7 @@
 /**
- * @file per_dep.h
+ * @file bsp_gpio.c
  *
- * This file contains the peripheral dependency and portability macros
+ * This file contains the Board Support Package (BSP)  GPIO
  *
  * Copyright (c) 2021 admaunaloa admaunaloa@gmail.com
  *
@@ -24,28 +24,15 @@
  * SOFTWARE.
  */
 
-#ifndef per_dep_h
-#define per_dep_h
+#include "bsp_gpio.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+/// Initialize GPIO
+void bsp_gpio_init(void)
+{
+    per_gpio_init_in(bsp_user_button_1(), PER_GPIO_PUPD_PULL_DOWN);
 
-// All the external dependencies of the library
-#include <stdbool.h>
-#include <stdint.h>
+    per_gpio_init_out(bsp_gpio_led_blue(), PER_GPIO_OTYPE_PUSH_PULL, PER_GPIO_OSPEED_LOW);
 
-/// Provide the correct in-line definition for the project here
-#define per_inline inline
-
-/// Provide the correct LOG2 function
-#define per_log2(x) __builtin_ctz(x)
-
-/// Logging peripheral error event with value
-void per_dep_log_err(uint_fast32_t per, uint_fast32_t ev, uint_fast32_t val);
-
-#ifdef __cplusplus
+    per_gpio_init_out_af(bsp_gpio_usart2_tx(), PER_GPIO_OTYPE_PUSH_PULL, PER_GPIO_OSPEED_MEDIUM, PER_GPIO_AF_USART2);
+    per_gpio_init_in_af(bsp_gpio_usart2_rx(), PER_GPIO_PUPD_PULL_UP, PER_GPIO_AF_USART2);
 }
-#endif
-
-#endif // per_dep_h
