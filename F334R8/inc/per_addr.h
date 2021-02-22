@@ -31,6 +31,8 @@
 extern "C" {
 #endif
 
+#include "per_dep.h"
+
 #define PER_ADDR_FLASH            ((uintptr_t) 0x08000000) ///< FLASH base address in the alias region
 #define PER_ADDR_CCMDATARAM       ((uintptr_t) 0x10000000) ///< CCM (core coupled memory) data RAM (64 KB) base address in the alias region
 #define PER_ADDR_SRAM             ((uintptr_t) 0x20000000) ///< SRAM base address in the alias region
