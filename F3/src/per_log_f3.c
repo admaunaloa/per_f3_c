@@ -1,7 +1,7 @@
 /**
- * @file bsp_dep.c
+ * @file per_log_f3.c
  *
- * This file contains the Board Support Package (BSP) dependencies
+ * This file contains the peripheral logging functions
  *
  * Copyright (c) 2021 admaunaloa admaunaloa@gmail.com
  *
@@ -24,49 +24,55 @@
  * SOFTWARE.
  */
 
-#include "bsp_dep.h"
+#include "per_log_f3.h"
 
-#include "cmsis_gcc.h" // for the LDREX and STREX
-#include "per_des.h"
+static per_log_event_t last; //!< Last event
+static volatile uint32_t count; //!< Number of errors
+static void (*callback)(per_log_e per, uint_fast32_t ev, uint_fast32_t val);
 
-/// Get random key number
-uint32_t bsp_dep_key_gen(void)
+/// Logging peripheral error event with value, can be called from interrupt and user-space
+void per_log_err(per_log_e per, uint_fast32_t ev, uint_fast32_t val)
 {
-    static uint32_t key;
-    key += per_des_uid()->Uid0;
+    uint32_t cnt;
 
-    if (0 == key)
+    do
     {
-        key += 1;
+        cnt = ++count;
+        last.peripheral = per;
+        last.event = ev;
+        last.value = val;
     }
+    while(cnt != count);
 
-    return key;
+    if (0 != callback)
+    {
+        callback(per, ev, val); // inform user
+    }
 }
 
-/// Lock a mutex
-uint16_t bsp_dep_mut16_lock(uint16_t* mut)
+/// Logging user callback function set
+void per_log_set_callback(void (*fct)(per_log_e per, uint_fast32_t ev, uint_fast32_t val))
 {
-    uint16_t res = 0; // no lock
-
-    if (0 == __LDREXH(mut)) // Load with exclusive access, zero is free
-    {
-        uint16_t key = (uint16_t)bsp_dep_key_gen();
-
-        if (0 == __STREXH(key, mut)) // Store with exclusive access
-        {
-            __DMB(); // Success, synchronize with data memory barrier
-            res = key;
-        }
-    }
-
-    return res;
+    callback = fct;
 }
 
-/// Unlock a mutex
-void bsp_dep_mut16_unlock(uint16_t* mut, uint16_t key)
+/// Logging user callback function clear
+void per_log_clr_callback(void)
 {
-    if (key == *mut)
+    callback = 0;
+}
+
+/// Get last logging event, is consistent even when interrupted.
+uint32_t per_log_get(per_log_event_t* ev)
+{
+    uint32_t cnt;
+
+    do
     {
-        *mut = 0; // Clear it
+        cnt = count;
+        per_mem_copy(ev, &last, sizeof(*ev));
     }
+    while(cnt != count);
+
+    return cnt;
 }

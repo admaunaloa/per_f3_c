@@ -41,10 +41,6 @@ uint16_t bsp_dep_mut16_lock(uint16_t* mut);
 
 void bsp_dep_mut16_unlock(uint16_t* mut, uint16_t key);
 
-void bsp_dep_log_err(uint_fast32_t per, uint_fast32_t ev, uint_fast32_t val);
-
-uint32_t bsp_dep_log_err_tot(void);
-
 #ifdef __cplusplus
 }
 #endif
