@@ -139,16 +139,20 @@ typedef enum
     PER_LOG_WWDG, ///< WWDG
 } per_log_e;
 
-/// Logging generate a compile/link time error if
-/// a peripheral variant does not support a specific function
-/// Do NOT implement this! The compiler is a friend
-void per_log_err_function_not_supported(void);
-
-/// Logging peripheral error event with value
-static per_inline void per_log_err(per_log_e per, uint_fast32_t ev, uint_fast32_t val)
+typedef struct
 {
-    per_dep_log_err((uint_fast32_t)per, ev, val);
-}
+    per_log_e peripheral;  //!< Last error peripheral number
+    uint32_t event;  //!< Last error event number
+    uint32_t value;  //!< Last error value
+} per_log_event_t;
+
+void per_log_err(per_log_e per, uint_fast32_t ev, uint_fast32_t val);
+
+void per_log_set_callback(void (*fct)(per_log_e per, uint_fast32_t ev, uint_fast32_t val));
+
+void per_log_clr_callback(void);
+
+uint32_t per_log_get(per_log_event_t* event);
 
 #ifdef __cplusplus
 }
